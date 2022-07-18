@@ -4248,6 +4248,11 @@ fb-watchman@^2.0.0:
   dependencies:
     bser "2.1.1"
 
+file-encryptor@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/file-encryptor/-/file-encryptor-0.1.1.tgz#506a5aba153cc109943c38fd445506a84557b9fe"
+  integrity sha512-F/grL/7aWLiXRkS9Xmw03qosDGP1mc4mLQD9aQIZgkG3JX0Z+Vcubo0AKJqMO0cqSyPEXfsv0b1orR513yEK5g==
+
 file-entry-cache@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/file-entry-cache/-/file-entry-cache-6.0.1.tgz#211b2dd9659cb0394b073e7323ac3c933d522027"
