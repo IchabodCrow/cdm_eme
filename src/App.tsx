@@ -11,7 +11,7 @@ import sintelVideoUrl from "./assets/sintel-trailer_video-clearkey-subsample-enc
 import sintelAudioUrl from "./assets/sintel-trailer_audio-clearkey-subsample-encrypted.webm";
 import bunnyOriginVideoUrl from "./assets/big-buck-bunny_trailer.webm";
 import sintelOriginVideoUrl from "./assets/sintel.webm";
-import { Player } from "./components/Player";
+import Player from "./components/Player";
 
 function App() {
   return (

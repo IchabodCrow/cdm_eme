@@ -5,18 +5,19 @@ import { DRM_SYSTEM_TYPE } from "src/mokedData/mimeTypes";
 export const initMediaKeys = async (
   video: HTMLVideoElement | null
 ): Promise<void> => {
-  const keySystem = await navigator.requestMediaKeySystemAccess(
-    DRM_SYSTEM_TYPE,
-    keySystemConfig
-  );
-  const mediaKeys = await keySystem.createMediaKeys();
-
-  video?.setMediaKeys(mediaKeys);
+  if (!video?.mediaKeys) {
+    const keySystem = await navigator.requestMediaKeySystemAccess(
+      DRM_SYSTEM_TYPE,
+      keySystemConfig
+    );
+    const mediaKeys = await keySystem.createMediaKeys();
+    video?.setMediaKeys(mediaKeys);
+  }
 };
 
 export const createMediaKeySession = (
   { initDataType, initData }: MediaEncryptedEvent,
-  mediaKeys: MediaKeys | null | undefined
+  mediaKeys?: MediaKeys | null
 ): void => {
   const session = mediaKeys?.createSession();
   session?.addEventListener("message", messageHandler);

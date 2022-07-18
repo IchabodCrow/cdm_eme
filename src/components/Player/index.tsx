@@ -1,4 +1,4 @@
-import React, { ReactElement, SyntheticEvent, useEffect, useRef, useState } from "react";
+import React, { memo, ReactElement, SyntheticEvent, useEffect, useState } from "react";
 import { initMediaKeys, createMediaKeySession } from "./helpers/mediaKeys";
 import { loadSourceBuffer } from "./helpers/loadSourceBuffer";
 
@@ -9,29 +9,44 @@ interface PlayerProps {
   audioMimeType: string
 }
 
-export const Player = ({videoUrl, audioUrl, videoMimeType, audioMimeType}: PlayerProps): ReactElement => {
-  const [mediaSource] = useState(new MediaSource());
-  const videoRef = useRef<HTMLVideoElement>(null);
+const Player = ({videoUrl, audioUrl, videoMimeType, audioMimeType}: PlayerProps): ReactElement => {
+  const [$video, setVideo] = useState<HTMLVideoElement | null>(null);
+  const [src, setSrc] = useState<string | undefined >()
 
   useEffect(() => {
-    videoRef.current?.setAttribute('src', URL.createObjectURL(mediaSource));
-    mediaSource.addEventListener("sourceopen", async () => {
-     loadSourceBuffer(mediaSource, videoUrl, videoMimeType)
-     loadSourceBuffer(mediaSource, audioUrl, audioMimeType)
-    });
-  }, [mediaSource, videoUrl, audioUrl, videoMimeType, audioMimeType]);
+    const mediaSource = new MediaSource()
+
+    const handleSourceOpen = (): void => {
+      loadSourceBuffer(mediaSource, videoUrl, videoMimeType)
+      loadSourceBuffer(mediaSource, audioUrl, audioMimeType)
+    }
+    
+    mediaSource.addEventListener("sourceopen", handleSourceOpen);
+    const src = URL.createObjectURL(mediaSource);
+    setSrc(src)
+
+    return () => {
+      URL.revokeObjectURL(src)
+      mediaSource.removeEventListener('sourceopen', handleSourceOpen)
+    }
+  }, [videoUrl, audioUrl, videoMimeType, audioMimeType]);
 
   useEffect(() => {
-    initMediaKeys(videoRef.current);
-  }, [videoRef]);
+    if ($video != null) initMediaKeys($video);
+  }, [$video]);
 
-  const handleEncrypt = (e:SyntheticEvent<HTMLVideoElement, MediaEncryptedEvent>) => {
-    createMediaKeySession(e.nativeEvent, videoRef.current?.mediaKeys)
-  }
+  const handleEncrypt = (
+    e: SyntheticEvent<HTMLVideoElement, MediaEncryptedEvent>
+  ) => {
+    if ($video?.mediaKeys != null)
+      createMediaKeySession(e.nativeEvent, $video.mediaKeys);
+  };
 
   return (
-    <video ref={videoRef} onEncrypted={handleEncrypt} controls preload="metadata">
+    <video ref={setVideo} onEncrypted={handleEncrypt} src={src} controls preload="metadata">
         Video not supported.
     </video>
   )
 };
+
+export default memo(Player)
