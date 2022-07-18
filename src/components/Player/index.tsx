@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useRef, useState } from "react";
+import React, { ReactElement, SyntheticEvent, useEffect, useRef, useState } from "react";
 import { initMediaKeys, createMediaKeySession } from "./helpers/mediaKeys";
 import { loadSourceBuffer } from "./helpers/loadSourceBuffer";
 
@@ -22,14 +22,15 @@ export const Player = ({videoUrl, audioUrl, videoMimeType, audioMimeType}: Playe
   }, [mediaSource, videoUrl, audioUrl, videoMimeType, audioMimeType]);
 
   useEffect(() => {
-    (async() => {
-      const mediaKeys = await initMediaKeys(videoRef.current);
-      videoRef?.current?.addEventListener("encrypted", (e) =>  createMediaKeySession(e, mediaKeys));
-    } )()
+    initMediaKeys(videoRef.current);
   }, [videoRef]);
 
+  const handleEncrypt = (e:SyntheticEvent<HTMLVideoElement, MediaEncryptedEvent>) => {
+    createMediaKeySession(e.nativeEvent, videoRef.current?.mediaKeys)
+  }
+
   return (
-    <video ref={videoRef} controls preload="metadata">
+    <video ref={videoRef} onEncrypted={handleEncrypt} controls preload="metadata">
         Video not supported.
     </video>
   )
